@@ -14,7 +14,7 @@ export default async function Navbar() {
     <nav className="flex items-center justify-between  md:px-30  py-5 px-6 lg:px-25 border-b border-neutral-500 ">
       <div className="flex gap-2 items-center">
         <Link href={"/"}>
-          <Image src="/images/logo.svg" alt="Logo" width={30} height={30} />
+          <Image src="/images/Logo.svg" alt="Logo" width={30} height={30} />
         </Link>
         <h1 className="text-display-xs font-bold">Sociality</h1>
       </div>
