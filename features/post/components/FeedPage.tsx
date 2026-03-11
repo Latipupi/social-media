@@ -16,7 +16,6 @@ export default function FeedPage() {
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    // Ambil token saat sudah di client
     setToken(Cookies.get("auth_token"));
     setMounted(true);
     router.refresh();
