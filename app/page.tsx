@@ -1,7 +1,9 @@
-import Image from "next/image";
+import FeedPage from "@/features/post/components/FeedPage";
 
 export default function Home() {
   return (
-    <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 bg"></div>
+    <div className="md:px-105 px-10">
+      <FeedPage />
+    </div>
   );
 }

@@ -1,125 +1,124 @@
 "use client";
 
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import z from "zod";
 import Link from "next/link";
-import { EyeIcon } from "lucide-react"; // Install lucide-react jika belum
+import { EyeIcon } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
+import Image from "next/image";
+import { useLogin } from "../hooks/hooks";
 
 const formSchema = z.object({
-  email: z.string().email("Email tidak valid"),
-  password: z.string().min(6, "Password minimal 6 karakter"),
+  email: z
+    .string()
+    .min(1, { message: "Email is required" })
+    .email({ message: "Invalid email address" }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters" }),
 });
 
-export default function LoginForm() {
-  const form = useForm<z.infer<typeof formSchema>>({
+export function LoginForm() {
+  const { mutate, isPending, error } = useLogin();
+
+  const form = useForm({
     resolver: zodResolver(formSchema),
-    defaultValues: { email: "", password: "" },
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    console.log(values);
+  function onSubmit(data: z.infer<typeof formSchema>) {
+    mutate(data, {
+      onError: () => {
+        toast.error("Login failed. Please check your credentials.");
+      },
+    });
   }
 
   return (
-    <main className="min-h-screen w-full bg-neutral-950 flex flex-col items-center justify-center p-spacing-xl relative overflow-hidden">
-      {/* Efek Glow di Background */}
-      <div className="absolute inset-0 bg-login-glow pointer-events-none" />
-
-      <div className="w-full max-w-[400px] z-10">
-        {/* Logo & Header */}
-        <div className="flex flex-col items-center mb-spacing-4xl">
-          <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-white rounded-full flex items-center justify-center">
-              <span className="text-black font-bold text-xl">✺</span>
-            </div>
-            <span className="text-white text-display-xs font-bold tracking-tight">
-              Sociality
-            </span>
-          </div>
-          <h1 className="text-white text-display-sm font-semibold mt-4">
-            Welcome Back!
+    <div className="w-86.25 h-112.5 flex flex-col text-white bg-neutral-900 rounded-2xl border border-neutral-600 py-8 px-4">
+      <div className="flex flex-col justify-center items-center mt-8">
+        <div className="flex items-center gap-2 mb-4">
+          <Image src={"/images/Logo.svg"} alt="Logo" width={30} height={30} />
+          <h1 className="text-display-xs font-bold text-neutral-25">
+            Sociality
           </h1>
         </div>
-
-        {/* Card Form */}
-        <div className="bg-neutral-900/50 backdrop-blur-md border border-neutral-800 rounded-3xl p-spacing-2xl shadow-2xl">
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-spacing-xl"
-            >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-neutral-25">Email</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Enter your email"
-                        {...field}
-                        className="bg-neutral-950/50 border-neutral-800 text-white h-12 rounded-xl focus:ring-brand-200"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-neutral-25">Password</FormLabel>
-                    <FormControl>
-                      <div className="relative">
-                        <Input
-                          type="password"
-                          placeholder="Enter your password"
-                          {...field}
-                          className="bg-neutral-950/50 border-neutral-800 text-white h-12 rounded-xl pr-10 focus:ring-brand-200"
-                        />
-                        <EyeIcon className="absolute right-3 top-3.5 w-5 h-5 text-neutral-500 cursor-pointer" />
-                      </div>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <Button
-                type="submit"
-                className="w-full bg-brand-200 hover:bg-brand-300 text-white h-12 rounded-full text-text-md font-semibold transition-all"
-              >
-                Login
-              </Button>
-
-              <p className="text-center text-neutral-400 text-text-sm mt-4">
-                Don't have an account?{" "}
-                <Link
-                  href="/register"
-                  className="text-brand-200 font-bold hover:underline"
-                >
-                  Register
-                </Link>
-              </p>
-            </form>
-          </Form>
+        <div>
+          <h2 className="text-xl font-bold">Wellcome Back!</h2>
         </div>
       </div>
-    </main>
+      <form id="form-rhf-email" onSubmit={form.handleSubmit(onSubmit)}>
+        <FieldGroup>
+          <Controller
+            name="email"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="form-rhf-email">Email</FieldLabel>
+                <Input
+                  {...field}
+                  className="border-radius-xl bg-neutral-950 py-2 px-4 gap-2 w-78.25 h-12 border border-neutral-900"
+                  id="form-rhf-email"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Enter your email"
+                  autoComplete="off"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Controller
+            name="password"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="form-rhf-password">Password</FieldLabel>
+                <Input
+                  {...field}
+                  className="border-radius-xl bg-neutral-950 py-2 px-4 gap-2 w-78.25 h-12 border border-neutral-900"
+                  id="form-rhf-password"
+                  aria-invalid={fieldState.invalid}
+                  placeholder="Enter your password"
+                  autoComplete="off"
+                  type="password"
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[fieldState.error]} />
+                )}
+              </Field>
+            )}
+          />
+          <Button
+            type="submit"
+            className="w-full bg-primary-300 hover:bg-primary/90 text-primary-foreground  h-12 rounded-full"
+            disabled={isPending}
+          >
+            Login
+          </Button>
+
+          <p className="text-center">
+            Don't have an account?{" "}
+            <span className="text-primary-200 cursor-pointer font-bold">
+              <Link href="/register">Register</Link>
+            </span>
+          </p>
+        </FieldGroup>
+      </form>
+    </div>
   );
 }
